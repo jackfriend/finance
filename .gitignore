@@ -1,6 +1,7 @@
 # REPO SPECIFIC
 ##########
 data/
+config.py
 
 
 

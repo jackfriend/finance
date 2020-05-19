@@ -11,14 +11,14 @@ class Scraper:
     Generate an instant of the specified company
     """
 
-    def __init__(self, cik):
+    def __init__(self, cik, path):
         """
         make an instant of the scaper
         """
 
         # TODO: This is slow.... do this in Rust:
         #   a_function(tsv_filename, key='cik', value='instance') > return a string 
-        f = open('data/2020q1_notes/sub.tsv', 'r', newline='')
+        f = open(path + '/sub.tsv', 'r', newline='')
         reader = csv.DictReader(f, dialect='excel-tab')
         for row in reader:
             if row['cik'] == cik:
