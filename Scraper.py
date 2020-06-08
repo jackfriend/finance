@@ -17,11 +17,12 @@ class Scraper:
         """
 
         # TODO: This is slow.... do this in Rust:
-        #   a_function(tsv_filename, key='cik', value='instance') > return a string 
+        #   a_function(tsv_filename, key='cik', value='instance') > return a string
+        #   each may have multiple filings from the same company. Perhaps SQL query them all and return a list?
         f = open(path + '/sub.tsv', 'r', newline='')
         reader = csv.DictReader(f, dialect='excel-tab')
         for row in reader:
-            if row['cik'] == cik:
+            if row['cik'] == cik and (row['form'] == '10-Q' or row['form'] == '10-K'):
                 instance = row['instance']
                 adsh = row['adsh']
                 break
@@ -29,7 +30,7 @@ class Scraper:
         self.cik = cik
         self.adsh = adsh
         self.instance = {"xml": instance, "html": instance[:-4].replace('_', '.')}
-        self.extracted_xbrl_instance = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh.replace('-', ''), instance)
+        self.extracted_instance_doc = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh.replace('-', ''), instance)
         self.metalinks = r.get("https://www.sec.gov/Archives/edgar/data/{0}/{1}/MetaLinks.json".format(cik, adsh.replace('-', '')))
         self.metalinks = self.metalinks.json()
 
