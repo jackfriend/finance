@@ -23,14 +23,14 @@ class Scraper:
         for row in reader:
             if row['cik'] == cik:
                 instance = row['instance']
-                adsh = row['adsh'].replace('-', '')
+                adsh = row['adsh']
                 break
 
         self.cik = cik
         self.adsh = adsh
         self.instance = {"xml": instance, "html": instance[:-4].replace('_', '.')}
-        self.extracted_xbrl_instance = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh, instance)
-        self.metalinks = r.get("https://www.sec.gov/Archives/edgar/data/{0}/{1}/MetaLinks.json".format(cik, adsh))
+        self.extracted_xbrl_instance = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh.replace('-', ''), instance)
+        self.metalinks = r.get("https://www.sec.gov/Archives/edgar/data/{0}/{1}/MetaLinks.json".format(cik, adsh.replace('-', '')))
         self.metalinks = self.metalinks.json()
 
         # Schema, cal, pre, lab, def
