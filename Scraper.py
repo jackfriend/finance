@@ -22,17 +22,21 @@ class Scraper:
         f = open(path + '/sub.tsv', 'r', newline='')
         reader = csv.DictReader(f, dialect='excel-tab')
         for row in reader:
-            if row['cik'] == cik and (row['form'] == '10-Q' or row['form'] == '10-K'):
+            if row['cik'] == cik and row['form'] == '10-K':
                 instance = row['instance']
                 adsh = row['adsh']
                 break
 
         self.cik = cik
         self.adsh = adsh
-        self.instance = {"xml": instance, "html": instance[:-4].replace('_', '.')}
+        self.instance = {"xml": instance, "html": instance.replace('_htm.xml', '.htm')}
         self.extracted_instance_doc = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh.replace('-', ''), instance)
+        print(self.extracted_instance_doc)
         self.metalinks = r.get("https://www.sec.gov/Archives/edgar/data/{0}/{1}/MetaLinks.json".format(cik, adsh.replace('-', '')))
         self.metalinks = self.metalinks.json()
+
+        print(self.extracted_instance_doc)
+        print(self.instance['html'])
 
         # Schema, cal, pre, lab, def
         self.schema = self.fetch_link_from_metalinks("schema")
@@ -60,6 +64,12 @@ class Scraper:
         else:
             print("ERROR!> fetch_link_from_metalinks() takes 'cal', 'lab', 'pre', 'def', or 'schema'.")
 
+
+    def get_metalinks(self):
+        """
+        TODO: fill this out, return false if the file has no metalinks
+        """
+        pass
 
     def return_an_xbrl_doc(self, tag, href):
         """
