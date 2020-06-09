@@ -2,6 +2,10 @@
 
 Scrapes XBRL data from the SEC's EDGAR to collect financial sheet data.
 
+TODO:
+[x] fetch and extract zip from SEC Edgar
+[ ] save unzipped files correctly
+
 Uses:
 - AlphaVantage API for stock prices
 - Py-Edgar to get company

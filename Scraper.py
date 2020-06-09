@@ -2,9 +2,12 @@ from bs4 import BeautifulSoup
 import requests as r
 import sys
 import csv
+from zipfile import ZipFile
 from lxml import etree
 import re
 
+from util import *
+import config
 
 class Scraper:
     """
@@ -17,8 +20,6 @@ class Scraper:
         """
 
         # TODO: This is slow.... do this in Rust:
-        #   a_function(tsv_filename, key='cik', value='instance') > return a string
-        #   each may have multiple filings from the same company. Perhaps SQL query them all and return a list?
         f = open(path + '/sub.tsv', 'r', newline='')
         reader = csv.DictReader(f, dialect='excel-tab')
         for row in reader:
@@ -31,19 +32,14 @@ class Scraper:
         self.adsh = adsh
         self.instance = {"xml": instance, "html": instance.replace('_htm.xml', '.htm')}
         self.extracted_instance_doc = "https://www.sec.gov/Archives/edgar/data/{0}/{1}/{2}".format(cik, adsh.replace('-', ''), instance)
-        print(self.extracted_instance_doc)
-        self.metalinks = r.get("https://www.sec.gov/Archives/edgar/data/{0}/{1}/MetaLinks.json".format(cik, adsh.replace('-', '')))
-        self.metalinks = self.metalinks.json()
 
-        print(self.extracted_instance_doc)
-        print(self.instance['html'])
-
-        # Schema, cal, pre, lab, def
-        self.schema = self.fetch_link_from_metalinks("schema")
-        self.calculation = self.fetch_link_from_metalinks("cal")
-        self.definition = self.fetch_link_from_metalinks("def")
-        self.label = self.fetch_link_from_metalinks("lab")
-        self.presentation = self.fetch_link_from_metalinks("pre")
+        self.zip = unpack_zip("https://www.sec.gov/Archives/edgar/data/{0}/{1}/".format(cik, adsh.replace('-', '')),
+                "{0}-xbrl.zip".format(adsh),
+                config.DATA)
+        # self.calculation = 
+        # self.definition = 
+        # self.label = 
+        # self.presentation = 
         
 
     def fetch_link_from_metalinks(self, get_file):
@@ -59,17 +55,9 @@ class Scraper:
             return self.metalinks['instance'][self.instance['html']]['dts']['presentationLink']['local'][0]
         elif get_file == "def":
             return self.metalinks['instance'][self.instance['html']]['dts']['definitionLink']['local'][0]
-        elif get_file == "schema":
-            return self.metalinks['instance'][self.instance['html']]['dts']['schema']['local'][0]
         else:
-            print("ERROR!> fetch_link_from_metalinks() takes 'cal', 'lab', 'pre', 'def', or 'schema'.")
+            print("ERROR!> fetch_link_from_metalinks() takes 'cal', 'lab', 'pre', or 'def'.")
 
-
-    def get_metalinks(self):
-        """
-        TODO: fill this out, return false if the file has no metalinks
-        """
-        pass
 
     def return_an_xbrl_doc(self, tag, href):
         """
