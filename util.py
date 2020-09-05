@@ -38,5 +38,4 @@ def unpack_zip(url, zipname, path=None):
 		else:
 			namedict["misc"].append(name)
 
-
 	return namedict
